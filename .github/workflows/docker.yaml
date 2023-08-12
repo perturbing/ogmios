@@ -85,35 +85,34 @@ jobs:
       run: |
         echo "image=cardanosolutions/${{ matrix.target }}" >> $GITHUB_OUTPUT
 
-    - name: 🔨 Build and push (default latest)
-      if: ${{ github.event_name == 'push' && matrix.network == 'mainnet' }}
+    - name: 🏷️ Build and push (ogmios, default tag)
+      if: ${{ github.event_name == 'push' && matrix.network == 'mainnet' && matrix.target == 'ogmios' }}
       uses: docker/build-push-action@v2
       with:
         build-args: |
           NETWORK=${{ matrix.network }}
         context: .
         push: true
-        tags: ${{ steps.base-variables.outputs.image }}:latest
+        tags: ${{ steps.base-variables.outputs.image }}:v5.6.0
         target: ${{ matrix.target }}
-        platforms: linux/amd64
         cache-from: type=registry,ref=${{ steps.base-variables.outputs.image }}:latest
         cache-to: type=inline
 
-    - name: 🔨 Build and push (network latest)
-      if: ${{ github.event_name == 'push' }}
+    - name: 🏷️ Build and push (ogmios, network tags)
+      if: ${{ github.event_name == 'push' && matrix.target == 'ogmios' }}
       uses: docker/build-push-action@v2
       with:
         build-args: |
           NETWORK=${{ matrix.network }}
+          CARDANO_NODE_VERSION=${{ matrix.cardano_node_version }}
         context: .
         push: true
-        tags: ${{ steps.base-variables.outputs.image }}:latest-${{ matrix.network }}
+        tags: ${{ steps.base-variables.outputs.image }}:v5.6.0-${{ matrix.network }}
         target: ${{ matrix.target }}
-        platforms: linux/amd64
         cache-from: type=registry,ref=${{ steps.base-variables.outputs.image }}:latest-${{ matrix.network }}
         cache-to: type=inline
 
-    - name: 🏷️ Build and push (default tag)
+    - name: 🏷️ Build and push (cardano-node-ogmios, default tag)
       if: ${{ github.event_name == 'push' && matrix.network == 'mainnet' && matrix.target == 'cardano-node-ogmios' }}
       uses: docker/build-push-action@v2
       with:
@@ -126,7 +125,7 @@ jobs:
         cache-from: type=registry,ref=${{ steps.base-variables.outputs.image }}:latest
         cache-to: type=inline
 
-    - name: 🏷️ Build and push (network tags)
+    - name: 🏷️ Build and push (cardano-node-ogmios, network tags)
       if: ${{ github.event_name == 'push' && matrix.target == 'cardano-node-ogmios' }}
       uses: docker/build-push-action@v2
       with:
